@@ -28,6 +28,18 @@ def coord_input(coord): #функция ввода координат игрок
     else:
         coord_j = int(coord[1])
     return [coord_i, coord_j]
+def winner_check(player): #функция проверки условия победы того или иного игрока
+    if my_matrix[1].count(player) == 3 \
+    or my_matrix[2].count(player) == 3 \
+    or my_matrix[3].count(player) == 3 \
+    or my_matrix[1][1] == player and my_matrix[2][2] == player and my_matrix[3][3] == player \
+    or my_matrix[1][3] == player and my_matrix[2][2] == player and my_matrix[3][1] == player \
+    or my_matrix[1][1] == player and my_matrix[2][1] == player and my_matrix[3][1] == player \
+    or my_matrix[1][2] == player and my_matrix[2][2] == player and my_matrix[3][2] == player \
+    or my_matrix[1][3] == player and my_matrix[2][3] == player and my_matrix[3][3] == player:
+        return True
+    else:
+        return False
 while X_win_condition == False and O_win_condition == False: #цикл действует, пока не выполнится условие победы одного из игроков
     X_coord = input("Игрок X, ваш ход:") #игрок Х вводит координаты
     if my_matrix[coord_input(X_coord)[0]][coord_input(X_coord)[1]] == " ": #проверка, не занята ли данная клетка, если занята - то ничего не произойдет
@@ -40,22 +52,8 @@ while X_win_condition == False and O_win_condition == False: #цикл дейс�
             print(my_matrix[i][j], end=" ")
         print()
     print("_______________")
-    X_win_condition = my_matrix[1].count("X") == 3 \
-                      or my_matrix[2].count("X") == 3 \
-                      or my_matrix[3].count("X") == 3 \
-                      or my_matrix[1][1] == "X" and my_matrix[2][2] == "X" and my_matrix[3][3] == "X" \
-                      or my_matrix[1][3] == "X" and my_matrix[2][2] == "X" and my_matrix[3][1] == "X" \
-                      or my_matrix[1][1] == "X" and my_matrix[2][1] == "X" and my_matrix[3][1] == "X" \
-                      or my_matrix[1][2] == "X" and my_matrix[2][2] == "X" and my_matrix[3][2] == "X" \
-                      or my_matrix[1][3] == "X" and my_matrix[2][3] == "X" and my_matrix[3][3] == "X"  # проверка условия победы игрока с крестиком
-    O_win_condition = my_matrix[1].count("O") == 3 \
-                      or my_matrix[2].count("O") == 3 \
-                      or my_matrix[3].count("O") == 3 \
-                      or my_matrix[1][1] == "O" and my_matrix[2][2] == "O" and my_matrix[3][3] == "O" \
-                      or my_matrix[1][3] == "O" and my_matrix[2][2] == "O" and my_matrix[3][1] == "O" \
-                      or my_matrix[1][1] == "O" and my_matrix[2][1] == "O" and my_matrix[3][1] == "O" \
-                      or my_matrix[1][2] == "O" and my_matrix[2][2] == "O" and my_matrix[3][2] == "O" \
-                      or my_matrix[1][3] == "O" and my_matrix[2][3] == "O" and my_matrix[3][3] == "O"  # проверка условия победы игрока с ноликом
+    X_win_condition = winner_check("X")  # проверка условия победы игрока с крестиком
+    O_win_condition = winner_check("O")  # проверка условия победы игрока с ноликом
 if X_win_condition: #проверка кто победил, если оба выстроили линию то в любом случае побеждает Х, т.к. ходил первый
     print("ПОБЕДА ИГРОКА Х!")
 else:
