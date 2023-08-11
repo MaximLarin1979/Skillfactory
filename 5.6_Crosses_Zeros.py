@@ -11,12 +11,14 @@ my_matrix = [[" ","1","2","3"], ["1"," "," "," "],["2"," "," "," "],["3"," "," "
 X_win_condition = False #условие победы игрока с крестиком
 O_win_condition = False #условие победы игрока с ноликом
 draw_condition = False #условие ничьей
+
 def playboard(): #функция вывода игрового поля
     for i in range(4):
         for j in range(4):
             print(my_matrix[i][j], end=" ")
         print()
     print("_______________")
+
 def coord_input(coord): #функция ввода координат игроками (в виде строки) и трансформация их в 2 координаты - натуральные числа от 1 до 3
     if int(coord[0]) < 1: #проверка диапазона, если введенная координата меньше 1, то приравниваем к 1, если больше 3 то приравниваем к 3
         coord_i = 1
@@ -31,6 +33,7 @@ def coord_input(coord): #функция ввода координат игрок
     else:
         coord_j = int(coord[1])
     return [coord_i, coord_j]
+
 def winner_check(player): #функция проверки условия победы того или иного игрока
     if my_matrix[1].count(player) == 3 \
     or my_matrix[2].count(player) == 3 \
@@ -43,11 +46,13 @@ def winner_check(player): #функция проверки условия поб
         return True
     else:
         return False
+
 def draw_check(): #функция проверки ничьей
     if " " in my_matrix[1] or " " in my_matrix[2] or " " in my_matrix[3]:
         return False
     else:
         return True
+
 playboard() #вывод начального игрового поля
 while X_win_condition == False and O_win_condition == False and draw_condition == False: #цикл действует, пока не выполнится условие победы одного из игроков или не будет ничьей
     X_coord = input("Игрок X, ваш ход:") #игрок Х вводит координаты
