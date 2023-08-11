@@ -59,6 +59,10 @@ while X_win_condition == False and O_win_condition == False and draw_condition =
     while my_matrix[coord_input(X_coord)[0]][coord_input(X_coord)[1]] != " ": #если клетка занята, то игрок вводит значение еще раз
         X_coord = input("Игрок X, клетка занята, введите координаты еще раз:")
     my_matrix[coord_input(X_coord)[0]][coord_input(X_coord)[1]] = "X" #езначение клетки заменяется Х
+    draw_condition = draw_check()
+    if draw_condition: #проверка на ничью делается после хода игрока Х, т.к. 9й ход приходится именно на Х
+        playboard()
+        break
     O_coord = input("Игрок O, ваш ход:") #игрок O вводит координаты
     while my_matrix[coord_input(O_coord)[0]][
         coord_input(O_coord)[1]] != " ":  # если клетка занята, то игрок вводит значение еще раз
