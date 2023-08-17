@@ -26,10 +26,10 @@ class Ship:
     def dots(self):
         if self.direction == 0:
             for i in range(self.size):
-                self.ship_dots = self.ship_dots + [Dot(self.x, self.y + i)]
+                self.ship_dots = self.ship_dots + [Dot(self.x - 1, self.y + i - 1)]
         else:
             for i in range(self.size):
-                self.ship_dots = self.ship_dots + [Dot(self.x + i, self.y)]
+                self.ship_dots = self.ship_dots + [Dot(self.x + i - 1, self.y - 1)]
         return self.ship_dots
 
 
