@@ -37,43 +37,26 @@ class Board:
     def __init__(self, board=None, ships = None, hid = False, live_ships = None):
         if board is None:
             board = []
-        self.board = [[Dot] * 6] * 6
+        self.board = [[Dot.empty_dot] * 6 for _ in range(6)]
         self.ships = ships
         self.hid = hid
         self.live_ships = live_ships
 
     def generate_board(self):
-        for i in range(6): #генерируем точки
-            for j in range(6):
-                self.board[i][j] = Dot(i, j).empty_dot
         if self.hid == False:
             for i in range(6):
                 for j in range(6):
-                    print(self.board[i][j], end="")
+                    print(self.board[i][j], end="  ")
                 print()
 
     def add_ship(self, ship_dots):
         for i in ship_dots:
-            print([i.x], [i.y])
             self.board[i.x][i.y] = i.ship_dot
-        for i in range(6):
-            for j in range(6):
-                print(self.board[i][j], end="")
-            print()
         return self.board
 
 b = Board()
 b.generate_board()
 
-
 ship = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
-print(ship.dots())
-
 b.add_ship(ship.dots())
-
-
-
-
-
-
-
+b.generate_board()
