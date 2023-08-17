@@ -54,11 +54,15 @@ class Board:
 
     def add_ship(self, ship_dots):
         for i in ship_dots:
-            print(ship_dots[i].x)
+            print([i.x], [i.y])
+            self.board[i.x][i.y] = i.ship_dot
+        for i in range(6):
+            for j in range(6):
+                print(self.board[i][j], end="")
+            print()
         return self.board
 
 b = Board()
-print(b.board)
 b.generate_board()
 
 
@@ -66,6 +70,10 @@ ship = Ship(3, int(input('x')), int(input('y')), int(input('направлени
 print(ship.dots())
 
 b.add_ship(ship.dots())
+
+
+
+
 
 
 
