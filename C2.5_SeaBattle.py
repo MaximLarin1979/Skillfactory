@@ -2,7 +2,7 @@
 class Dot:
     type = 'dot'
     empty_dot = "O"
-    ship_dot = "◼︎"
+    ship_dot = "■"
     destroyed_ship_dot = "X"
     missed_dot = "T"
 
@@ -44,9 +44,17 @@ class Board:
 
     def generate_board(self):
         if self.hid == False:
+            for i in range(7):
+                if i ==0:
+                    i = " "
+                print(i, end= " | ")
+            print()
             for i in range(6):
                 for j in range(6):
-                    print(self.board[i][j], end="  ")
+                    if j == 0:
+                        print(i+1, "|", self.board[i][j], end=" | ")
+                    else:
+                        print(self.board[i][j], end=" | ")
                 print()
 
     def add_ship(self, ship_dots):
