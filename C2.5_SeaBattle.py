@@ -78,6 +78,7 @@ class Board:  # класс игровой доски
         self.ships = ships
         self.hid = hid
         self.live_ships = 7
+        self.ship_contours = []
 
     def generate_board(self):  # метод вывода доски (с красивой графикой)
         if self.hid == False:
@@ -96,12 +97,39 @@ class Board:  # класс игровой доски
         print(f"\n{self.live_ships} кораблей в строю")  # показываем игроку, сколько у него живых кораблей осталось
 
     def add_ship(self, ship_dots, ship_contour):  # метод добавления корабля на игровую доску
-        self.ships = self.ships + [ship_dots]  # дополняем список кораблей списком точек очередного корабля
-        for i in ship_dots:  # ставим корабль на доску
-            self.board[i.x][i.y] = i.ship_dot
-        for i in ship_contour:  # ставим корабль на доску
-            self.board[i.x][i.y] = i.destroyed_ship_dot
-        return self.board, self.ships
+        try:
+            for i in ship_dots:  # проверяем, не находится ли какая-то из точек корабля в "запретном диапазоне"
+                if i in self.ships or i in self.ship_contours or 0 <= i.x < 6 <= i.y < 0:
+                    raise ValueError ("Диапазон занят, попробуйте еще раз")
+            self.ships = self.ships + [ship_dots]  # дополняем список кораблей списком точек очередного корабля
+            for i in ship_dots:  # ставим корабль на доску
+                self.board[i.x][i.y] = i.ship_dot
+            for i in ship_contour:  # добавляем контур корабля в список контуров доски
+                self.ship_contours = self.ship_contours + i
+            return self.board, self.ships, self.ship_contours
+        exept ValueError:
+            return False
+
+
+class Player:
+    def __init__(self, player_board=None, ai_board=None):
+        self.player_board = Board()
+        self.ai_board = Board()
+
+class Game:
+
+    def _init__(self, player, player_board, ai, ai_board):
+        self.player = player
+        self.player.board = Board()
+        self.ai = ai
+        self.ai_board = Board()
+
+    def gen_player_board(self, player_board):
+        cruiser = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
+        self.player_board = Board.add_ship(cruiser.dots(), cruiser.contour(cruiser.dots()))
+        Board.generate_board()
+
+
 
 
 
