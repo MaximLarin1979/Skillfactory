@@ -63,8 +63,9 @@ class Ship:  # класс корабля
         for i in ship_dots:  # обводим корабль контуром в виде списка точек
             for a in range((i.x - 1), (i.x + 2)):
                 for b in range(i.y - 1, i.y + 2):
-                    if Dot(a, b) not in self.ship_contour and Dot(a, b) not in ship_dots and 0<=a<6 and 0<=b<6 :  # избегаем дублирования точек "контура"
-                        self.ship_contour = self.ship_contour + [Dot(a, b)]  # формируем список точек "контура", куда корабли ставить нельзя
+                    if Dot(a, b) not in self.ship_contour and Dot(a,b) not in ship_dots and 0 <= a < 6 and 0 <= b < 6:  # избегаем дублирования точек "контура"
+                        self.ship_contour = self.ship_contour + [
+                            Dot(a, b)]  # формируем список точек "контура", куда корабли ставить нельзя
         return self.ship_contour
 
     def hit_points(self):  # метод будет считать уменьшение здоровья корабля при попадании
@@ -99,42 +100,52 @@ class Board:  # класс игровой доски
     def add_ship(self, ship_dots, ship_contour):  # метод добавления корабля на игровую доску
         try:
             for i in ship_dots:  # проверяем, не находится ли какая-то из точек корабля в "запретном диапазоне"
-                if i in self.ships or i in self.ship_contours or 0 <= i.x < 6 <= i.y < 0:
-                    raise ValueError ("Диапазон занят, попробуйте еще раз")
-            self.ships = self.ships + [ship_dots]  # дополняем список кораблей списком точек очередного корабля
+                if i in self.ships or i in self.ship_contours or 0 > i.x >= 6 or 0 > i.y >= 6:
+                    raise IndexError("Диапазон занят либо некорректен попробуйте еще раз")
+            self.ships = self.ships + ship_dots  # дополняем список кораблей списком точек очередного корабля
             for i in ship_dots:  # ставим корабль на доску
                 self.board[i.x][i.y] = i.ship_dot
             for i in ship_contour:  # добавляем контур корабля в список контуров доски
-                self.ship_contours = self.ship_contours + i
+                self.ship_contours = self.ship_contours + [i]
             return self.board, self.ships, self.ship_contours
-        exept ValueError:
-            return False
+        except IndexError:
+            print("Диапазон занят либо некорректен, попробуйте еще раз")
+            return True
 
 
 class Player:
     def __init__(self, player_board=None, ai_board=None):
-        self.player_board = Board()
-        self.ai_board = Board()
+        self.player_b = Board()
+        self.ai_b = Board()
+
 
 class Game:
-
-    def _init__(self, player, player_board, ai, ai_board):
+    def _init__(self, player, ai):
         self.player = player
-        self.player.board = Board()
+        self.player_board = Board()
         self.ai = ai
         self.ai_board = Board()
 
-    def gen_player_board(self, player_board):
-        cruiser = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
-        self.player_board = Board.add_ship(cruiser.dots(), cruiser.contour(cruiser.dots()))
-        Board.generate_board()
+    def gen_player_board(self):
+        while True:
+            s1 = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
+            self.player_board = self.player_board.add_ship(s1.dots(), s1.contour(s1.dots()))
+            self.player_board.generate_board()
+        while True:
+            s2 = Ship(2, int(input('x')), int(input('y')), int(input('направление')))
+            self.player_board = self.player_board.add_ship(s2.dots(), s2.contour(s2.dots()))
+            self.player_board.generate_board()
 
 
 
 
 
-b = Board()
-s = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
-b.add_ship(s.dots(), s.contour(s.dots()))
-b.generate_board()
-print(b.ships)
+# b = Board()
+# s = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
+# b.add_ship(s.dots(), s.contour(s.dots()))
+# b.generate_board()
+# print(b.ships)
+# s2 = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
+# b.add_ship(s2.dots(), s2.contour(s2.dots()))
+# b.generate_board()
+# print(b.ships)
