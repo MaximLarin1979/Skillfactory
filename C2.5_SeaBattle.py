@@ -22,6 +22,7 @@
 #
 #     def is_twice_shot(self, shot, shot_list):  # этот метод будет проверять, не произведен ли выстрел в точку, куда уже стреляли
 #         None
+import random
 
 
 class Dot:  # класс точек
@@ -181,10 +182,55 @@ class Game:
         print('Расстановка кораблей успешно завершена')
         return self.player_board
 
-
+    def gen_ai_board(self):
+        while True:
+            cruiser = Ship(3, random.randint(0, 6), random.randint(0, 6), random.randint(0, 1))
+            self.ai_board.add_ship(cruiser.dots(), cruiser.contour(cruiser.dots()))
+            if self.ai_board.live_ships == 1:
+                break
+        self.ai_board.generate_board()
+        while True:
+            destroyer1 = Ship(2, random.randint(0, 6), random.randint(0, 6), random.randint(0, 1))
+            self.ai_board.add_ship(destroyer1.dots(), destroyer1.contour(destroyer1.dots()))
+            if self.ai_board.live_ships == 2:
+                break
+        self.ai_board.generate_board()
+        while True:
+            destroyer2 = Ship(2, random.randint(0, 6), random.randint(0, 6), random.randint(0, 1))
+            self.ai_board.add_ship(destroyer2.dots(), destroyer2.contour(destroyer2.dots()))
+            if self.ai_board.live_ships == 3:
+                break
+        self.ai_board.generate_board()
+        while True:
+            boat1 = Ship(1, random.randint(0, 6), random.randint(0, 6))
+            self.ai_board.add_ship(boat1.dots(), boat1.contour(boat1.dots()))
+            if self.ai_board.live_ships == 4:
+                break
+        self.ai_board.generate_board()
+        while True:
+            boat2 = Ship(1, random.randint(0, 6), random.randint(0, 6))
+            self.ai_board.add_ship(boat2.dots(), boat2.contour(boat2.dots()))
+            if self.ai_board.live_ships == 5:
+                break
+        self.ai_board.generate_board()
+        while True:
+            boat3 = Ship(1, random.randint(0, 6), random.randint(0, 6))
+            self.ai_board.add_ship(boat3.dots(), boat3.contour(boat3.dots()))
+            if self.ai_board.live_ships == 6:
+                break
+        self.ai_board.generate_board()
+        while True:
+            boat4 = Ship(1, random.randint(0, 6), random.randint(0, 6))
+            self.ai_board.add_ship(boat4.dots(), boat4.contour(boat4.dots()))
+            if self.ai_board.live_ships == 7:
+                break
+        self.ai_board.generate_board()
+        print()
+        print('Расстановка кораблей успешно завершена')
+        return self.ai_board
 
 g = Game()
-g.gen_player_board()
+g.gen_ai_board()
 
 # b = Board()
 # s = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
