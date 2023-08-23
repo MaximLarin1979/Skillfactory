@@ -64,7 +64,8 @@ class Ship:  # класс корабля
         for i in ship_dots:  # обводим корабль контуром в виде списка точек
             for a in range((i.x - 1), (i.x + 2)):
                 for b in range(i.y - 1, i.y + 2):
-                    if Dot(a, b) not in self.ship_contour and Dot(a,b) not in ship_dots and 0 <= a < 6 and 0 <= b < 6:  # избегаем дублирования точек "контура"
+                    if Dot(a, b) not in self.ship_contour and Dot(a,
+                                                                  b) not in ship_dots and 0 <= a < 6 and 0 <= b < 6:  # избегаем дублирования точек "контура"
                         self.ship_contour = self.ship_contour + [
                             Dot(a, b)]  # формируем список точек "контура", куда корабли ставить нельзя
         return self.ship_contour
@@ -98,20 +99,21 @@ class Board:  # класс игровой доски
                 print()
         print(f"\n{self.live_ships} кораблей в строю")  # показываем игроку, сколько у него живых кораблей осталось
 
-    def add_ship(self, ship_dots, ship_contour):  # метод добавления корабля на игровую доску
+    def add_ship(self, ship_dots, ship_contour, hid):  # метод добавления корабля на игровую доску
         try:
             for i in ship_dots:  # проверяем, не находится ли какая-то из точек корабля в "запретном диапазоне"
-                if i in self.ships or i in self.ship_contours or 0 > i.x >= 6 or 0 > i.y >= 6:
-                    raise IndexError("Диапазон занят либо некорректен попробуйте еще раз")
+                if i in self.ships or i in self.ship_contours or 1 > i.x >= 7 or 1 > i.y >= 7:
+                    raise IndexError
             self.ships = self.ships + ship_dots  # дополняем список кораблей списком точек очередного корабля
             for i in ship_dots:  # ставим корабль на доску
                 self.board[i.x][i.y] = i.ship_dot
             for i in ship_contour:  # добавляем контур корабля в список контуров доски
                 self.ship_contours = self.ship_contours + [i]
-            self.live_ships = self.live_ships + 1
+            self.live_ships = self.live_ships + 1  # добавляем установленный корабль в счетчик "живых кораблей"
             return self.board, self.ships, self.ship_contours, self.live_ships
         except IndexError:
-            print("Диапазон занят либо некорректен, попробуйте еще раз")
+            if hid is False:
+                print("Диапазон занят либо некорректен, попробуйте еще раз")
 
 
 class Player:
@@ -127,18 +129,20 @@ class Game:
         self.ai = ai
         self.ai_board = Board()
 
-    def gen_player_board(self):
+    def gen_player_board(self):  # метод устанавливает корабли и формирует игровую доску игрока-человека
         print("Устанавливаем крейсер (3 точки)")
         while True:
-            cruiser = Ship(3, int(input('Введите координату X')), int(input('Введите координату Y')), int(input('Введите направление')))
-            self.player_board.add_ship(cruiser.dots(), cruiser.contour(cruiser.dots()))
+            cruiser = Ship(3, int(input('Введите координату X')), int(input('Введите координату Y')),
+                           int(input('Введите направление')))
+            self.player_board.add_ship(cruiser.dots(), cruiser.contour(cruiser.dots()), False)
             if self.player_board.live_ships == 1:
                 break
         self.player_board.generate_board()
         print("Устанавливаем эсминец 1 (2 точки)")
         while True:
-            destroyer1 = Ship(2, int(input('Введите координату X')), int(input('Введите координату Y')), int(input('Введите направление')))
-            self.player_board.add_ship(destroyer1.dots(), destroyer1.contour(destroyer1.dots()))
+            destroyer1 = Ship(2, int(input('Введите координату X')), int(input('Введите координату Y')),
+                              int(input('Введите направление')))
+            self.player_board.add_ship(destroyer1.dots(), destroyer1.contour(destroyer1.dots()), False)
             if self.player_board.live_ships == 2:
                 break
         self.player_board.generate_board()
@@ -146,35 +150,35 @@ class Game:
         while True:
             destroyer2 = Ship(2, int(input('Введите координату X')), int(input('Введите координату Y')),
                               int(input('Введите направление')))
-            self.player_board.add_ship(destroyer2.dots(), destroyer2.contour(destroyer2.dots()))
+            self.player_board.add_ship(destroyer2.dots(), destroyer2.contour(destroyer2.dots()), False)
             if self.player_board.live_ships == 3:
                 break
         self.player_board.generate_board()
         print("Устанавливаем катер 1 (1 точка)")
         while True:
             boat1 = Ship(1, int(input('Введите координату X')), int(input('Введите координату Y')))
-            self.player_board.add_ship(boat1.dots(), boat1.contour(boat1.dots()))
+            self.player_board.add_ship(boat1.dots(), boat1.contour(boat1.dots()), False)
             if self.player_board.live_ships == 4:
                 break
         self.player_board.generate_board()
         print("Устанавливаем катер 2 (1 точка)")
         while True:
             boat2 = Ship(1, int(input('Введите координату X')), int(input('Введите координату Y')))
-            self.player_board.add_ship(boat2.dots(), boat2.contour(boat2.dots()))
+            self.player_board.add_ship(boat2.dots(), boat2.contour(boat2.dots()), False)
             if self.player_board.live_ships == 5:
                 break
         self.player_board.generate_board()
         print("Устанавливаем катер 3 (1 точка)")
         while True:
             boat3 = Ship(1, int(input('Введите координату X')), int(input('Введите координату Y')))
-            self.player_board.add_ship(boat3.dots(), boat3.contour(boat3.dots()))
+            self.player_board.add_ship(boat3.dots(), boat3.contour(boat3.dots()), False)
             if self.player_board.live_ships == 6:
                 break
         self.player_board.generate_board()
         print("Устанавливаем катер 4 (1 точка)")
         while True:
             boat4 = Ship(1, int(input('Введите координату X')), int(input('Введите координату Y')))
-            self.player_board.add_ship(boat4.dots(), boat4.contour(boat4.dots()))
+            self.player_board.add_ship(boat4.dots(), boat4.contour(boat4.dots()), False)
             if self.player_board.live_ships == 7:
                 break
         self.player_board.generate_board()
@@ -182,62 +186,172 @@ class Game:
         print('Расстановка кораблей успешно завершена')
         return self.player_board
 
-    def gen_ai_board(self):
-        while True:
-            cruiser = Ship(3, random.randint(0, 6), random.randint(0, 6), random.randint(0, 1))
-            self.ai_board.add_ship(cruiser.dots(), cruiser.contour(cruiser.dots()))
-            if self.ai_board.live_ships == 1:
-                break
+    # def gen_ai_board(self):  # метод устанавливает корабли и формирует игровую доску игрока-компьютера
+    #     result = 0
+    #     while result == 0:
+    #         counter = 0
+    #         while True:
+    #             cruiser = Ship(3, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
+    #             self.ai_board.add_ship(cruiser.dots(), cruiser.contour(cruiser.dots()), True)
+    #             counter = counter + 1
+    #             print(counter)
+    #             if counter > 500:
+    #                 result = 0
+    #                 break
+    #             if self.ai_board.live_ships == 1:
+    #                 result = 1
+    #                 break
+    #         while True:
+    #             destroyer1 = Ship(2, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
+    #             self.ai_board.add_ship(destroyer1.dots(), destroyer1.contour(destroyer1.dots()), True)
+    #             counter = counter + 1
+    #             print(counter)
+    #             if counter > 500:
+    #                 result = 0
+    #                 break
+    #             if self.ai_board.live_ships == 2:
+    #                 result = 1
+    #                 break
+    #         while True:
+    #             destroyer2 = Ship(2, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
+    #             self.ai_board.add_ship(destroyer2.dots(), destroyer2.contour(destroyer2.dots()), True)
+    #             counter = counter + 1
+    #             print(counter)
+    #             if counter > 500:
+    #                 result = 0
+    #                 break
+    #             if self.ai_board.live_ships == 3:
+    #                 result = 1
+    #                 break
+    #         while True:
+    #             boat1 = Ship(1, random.randint(1, 6), random.randint(1, 6))
+    #             self.ai_board.add_ship(boat1.dots(), boat1.contour(boat1.dots()), True)
+    #             counter = counter + 1
+    #             print(counter)
+    #             if counter > 500:
+    #                 result = 0
+    #                 break
+    #             if self.ai_board.live_ships == 4:
+    #                 result = 1
+    #                 break
+    #         while True:
+    #             boat2 = Ship(1, random.randint(1, 6), random.randint(1, 6))
+    #             self.ai_board.add_ship(boat2.dots(), boat2.contour(boat2.dots()), True)
+    #             counter = counter + 1
+    #             print(counter)
+    #             if counter > 500:
+    #                 result = 0
+    #                 break
+    #             if self.ai_board.live_ships == 5:
+    #                 result = 1
+    #                 break
+    #         while True:
+    #             boat3 = Ship(1, random.randint(1, 6), random.randint(1, 6))
+    #             self.ai_board.add_ship(boat3.dots(), boat3.contour(boat3.dots()), True)
+    #             counter = counter + 1
+    #             print(counter)
+    #             if counter > 500:
+    #                 result = 0
+    #                 break
+    #             if self.ai_board.live_ships == 6:
+    #                 result = 1
+    #                 break
+    #         while True:
+    #             boat4 = Ship(1, random.randint(1, 6), random.randint(1, 6))
+    #             self.ai_board.add_ship(boat4.dots(), boat4.contour(boat4.dots()), True)
+    #             counter = counter + 1
+    #             print(counter)
+    #             if counter > 500:
+    #                 result = 0
+    #                 break
+    #             if self.ai_board.live_ships == 7:
+    #                 result = 1
+    #                 break
+    #         self.ai_board.generate_board()
+    #     return self.ai_board
+
+
+    def gen_ai_board(self):  # метод устанавливает корабли и формирует игровую доску игрока-компьютера
+        ship_count = 0
+        for ship_size in (3, 2, 2, 1, 1, 1, 1):
+            ship_count = ship_count + 1
+            while True:
+                ship = Ship(ship_size, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
+                self.ai_board.add_ship(ship.dots(), ship.contour(ship.dots()), True)
+                if self.ai_board.live_ships == ship_count:
+                    print(ship.size, ship.x, ship.y, ship.direction)
+                    self.ai_board.generate_board()
+                    break
+
+            # while True:
+            #     destroyer1 = Ship(2, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
+            #     self.ai_board.add_ship(destroyer1.dots(), destroyer1.contour(destroyer1.dots()), True)
+            #     counter = counter + 1
+            #     print(counter)
+            #     if counter > 500:
+            #         result = 0
+            #         break
+            #     if self.ai_board.live_ships == 2:
+            #         result = 1
+            #         break
+            # while True:
+            #     destroyer2 = Ship(2, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
+            #     self.ai_board.add_ship(destroyer2.dots(), destroyer2.contour(destroyer2.dots()), True)
+            #     counter = counter + 1
+            #     print(counter)
+            #     if counter > 500:
+            #         result = 0
+            #         break
+            #     if self.ai_board.live_ships == 3:
+            #         result = 1
+            #         break
+            # while True:
+            #     boat1 = Ship(1, random.randint(1, 6), random.randint(1, 6))
+            #     self.ai_board.add_ship(boat1.dots(), boat1.contour(boat1.dots()), True)
+            #     counter = counter + 1
+            #     print(counter)
+            #     if counter > 500:
+            #         result = 0
+            #         break
+            #     if self.ai_board.live_ships == 4:
+            #         result = 1
+            #         break
+            # while True:
+            #     boat2 = Ship(1, random.randint(1, 6), random.randint(1, 6))
+            #     self.ai_board.add_ship(boat2.dots(), boat2.contour(boat2.dots()), True)
+            #     counter = counter + 1
+            #     print(counter)
+            #     if counter > 500:
+            #         result = 0
+            #         break
+            #     if self.ai_board.live_ships == 5:
+            #         result = 1
+            #         break
+            # while True:
+            #     boat3 = Ship(1, random.randint(1, 6), random.randint(1, 6))
+            #     self.ai_board.add_ship(boat3.dots(), boat3.contour(boat3.dots()), True)
+            #     counter = counter + 1
+            #     print(counter)
+            #     if counter > 500:
+            #         result = 0
+            #         break
+            #     if self.ai_board.live_ships == 6:
+            #         result = 1
+            #         break
+            # while True:
+            #     boat4 = Ship(1, random.randint(1, 6), random.randint(1, 6))
+            #     self.ai_board.add_ship(boat4.dots(), boat4.contour(boat4.dots()), True)
+            #     counter = counter + 1
+            #     print(counter)
+            #     if counter > 500:
+            #         result = 0
+            #         break
+            #     if self.ai_board.live_ships == 7:
+            #         result = 1
+            #         break
         self.ai_board.generate_board()
-        while True:
-            destroyer1 = Ship(2, random.randint(0, 6), random.randint(0, 6), random.randint(0, 1))
-            self.ai_board.add_ship(destroyer1.dots(), destroyer1.contour(destroyer1.dots()))
-            if self.ai_board.live_ships == 2:
-                break
-        self.ai_board.generate_board()
-        while True:
-            destroyer2 = Ship(2, random.randint(0, 6), random.randint(0, 6), random.randint(0, 1))
-            self.ai_board.add_ship(destroyer2.dots(), destroyer2.contour(destroyer2.dots()))
-            if self.ai_board.live_ships == 3:
-                break
-        self.ai_board.generate_board()
-        while True:
-            boat1 = Ship(1, random.randint(0, 6), random.randint(0, 6))
-            self.ai_board.add_ship(boat1.dots(), boat1.contour(boat1.dots()))
-            if self.ai_board.live_ships == 4:
-                break
-        self.ai_board.generate_board()
-        while True:
-            boat2 = Ship(1, random.randint(0, 6), random.randint(0, 6))
-            self.ai_board.add_ship(boat2.dots(), boat2.contour(boat2.dots()))
-            if self.ai_board.live_ships == 5:
-                break
-        self.ai_board.generate_board()
-        while True:
-            boat3 = Ship(1, random.randint(0, 6), random.randint(0, 6))
-            self.ai_board.add_ship(boat3.dots(), boat3.contour(boat3.dots()))
-            if self.ai_board.live_ships == 6:
-                break
-        self.ai_board.generate_board()
-        while True:
-            boat4 = Ship(1, random.randint(0, 6), random.randint(0, 6))
-            self.ai_board.add_ship(boat4.dots(), boat4.contour(boat4.dots()))
-            if self.ai_board.live_ships == 7:
-                break
-        self.ai_board.generate_board()
-        print()
-        print('Расстановка кораблей успешно завершена')
         return self.ai_board
 
 g = Game()
+# g.gen_player_board()
 g.gen_ai_board()
-
-# b = Board()
-# s = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
-# b.add_ship(s.dots(), s.contour(s.dots()))
-# b.generate_board()
-# print(b.ships)
-# s2 = Ship(3, int(input('x')), int(input('y')), int(input('направление')))
-# b.add_ship(s2.dots(), s2.contour(s2.dots()))
-# b.generate_board()
-# print(b.ships)
