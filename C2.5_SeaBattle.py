@@ -1,27 +1,3 @@
-# class Exeptions:  # класс исключений
-#     # def __init__(self, ship, board, shot, contour, twice_shot):
-#     #     self.ship = ship
-#     #     self.board = board
-#     #     self.shot = shot
-#     #     self.contour = contour
-#     #     self.twice_shot = twice_shot
-#
-#     def is_shot_in_board(self, shot, board):  # точка выстрела проверяется, соответствует ли списку точек доски
-#         if shot not in board:
-#             raise ValueError()
-#
-#     def is_ship_in_board(self, ship_dots, board):  # точки корабля проверяются, соответствуют ли списку точек доски
-#         for i in ship_dots:
-#             if i not in board:
-#                 raise ValueError()
-#
-#     def is_ship_out_contour(self, ship_dots, contour):  # точки корабля проверяются, соответствуют ли списку точек контуров
-#         for i in ship_dots:
-#             if i not in contour:
-#                 raise ValueError()
-#
-#     def is_twice_shot(self, shot, shot_list):  # этот метод будет проверять, не произведен ли выстрел в точку, куда уже стреляли
-#         None
 import random
 
 
@@ -64,8 +40,10 @@ class Ship:  # класс корабля
         for i in ship_dots:  # обводим корабль контуром в виде списка точек
             for a in range((i.x - 1), (i.x + 2)):
                 for b in range(i.y - 1, i.y + 2):
-                    if Dot(a, b) not in self.ship_contour and Dot(a, b) not in ship_dots and 0 <= a < 6 and 0 <= b < 6:  # избегаем дублирования точек "контура"
-                        self.ship_contour = self.ship_contour + [Dot(a, b)]  # формируем список точек "контура", куда корабли ставить нельзя
+                    if Dot(a, b) not in self.ship_contour and Dot(a,
+                                                                  b) not in ship_dots and 0 <= a < 6 and 0 <= b < 6:  # избегаем дублирования точек "контура"
+                        self.ship_contour = self.ship_contour + [
+                            Dot(a, b)]  # формируем список точек "контура", куда корабли ставить нельзя
         return self.ship_contour
 
     def hit_points(self):  # метод будет считать уменьшение здоровья корабля при попадании
@@ -100,8 +78,8 @@ class Board:  # класс игровой доски
     def add_ship(self, ship_dots, ship_contour, hid):  # метод добавления корабля на игровую доску
         try:
             for i in ship_dots:  # проверяем, не находится ли какая-то из точек корабля в "запретном диапазоне"
-                if i in self.ships or i in self.ship_contours or 1 > i.x >= 7 or 1 > i.y >= 7:
-                    raise IndexError
+                if i in self.ships or i in self.ship_contours or i.x < 0 or i.x > 5 or i.y < 0 or i.y > 5:
+                    raise IndexError  # если да, то инициируем ошибку
             self.ships = self.ships + ship_dots  # дополняем список кораблей списком точек очередного корабля
             for i in ship_dots:  # ставим корабль на доску
                 self.board[i.x][i.y] = i.ship_dot
@@ -110,7 +88,7 @@ class Board:  # класс игровой доски
             self.live_ships = self.live_ships + 1  # добавляем установленный корабль в счетчик "живых кораблей"
             return self.board, self.ships, self.ship_contours, self.live_ships
         except IndexError:
-            if hid is False:
+            if hid is False:  # этот параметр для расстановки доски игрока-компьютера, сообщение не выводим
                 print("Диапазон занят либо некорректен, попробуйте еще раз")
 
 
@@ -146,7 +124,8 @@ class Game:
         self.player_board.generate_board()
         print("Устанавливаем эсминец 2 (2 точки)")
         while True:
-            destroyer2 = Ship(2, int(input('Введите координату X')), int(input('Введите координату Y')), int(input('Введите направление')))
+            destroyer2 = Ship(2, int(input('Введите координату X')), int(input('Введите координату Y')),
+                              int(input('Введите направление')))
             self.player_board.add_ship(destroyer2.dots(), destroyer2.contour(destroyer2.dots()), False)
             if self.player_board.live_ships == 3:
                 break
@@ -183,58 +162,25 @@ class Game:
         print('Расстановка кораблей успешно завершена')
         return self.player_board
 
-    # def gen_ai_board(self):  # метод устанавливает корабли и формирует игровую доску игрока-компьютера (старая версия)
-    #     while True:
-    #         cruiser = Ship(3, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
-    #         self.ai_board.add_ship(cruiser.dots(), cruiser.contour(cruiser.dots()), True)
-    #         if self.ai_board.live_ships == 1:
-    #             break
-    #     while True:
-    #         destroyer1 = Ship(2, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
-    #         self.ai_board.add_ship(destroyer1.dots(), destroyer1.contour(destroyer1.dots()), True)
-    #         if self.ai_board.live_ships == 2:
-    #             break
-    #     while True:
-    #         destroyer2 = Ship(2, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
-    #         self.ai_board.add_ship(destroyer2.dots(), destroyer2.contour(destroyer2.dots()), True)
-    #         if self.ai_board.live_ships == 3:
-    #             break
-    #     while True:
-    #         boat1 = Ship(1, random.randint(1, 6), random.randint(1, 6))
-    #         self.ai_board.add_ship(boat1.dots(), boat1.contour(boat1.dots()), True)
-    #         if self.ai_board.live_ships == 4:
-    #             break
-    #     while True:
-    #         boat2 = Ship(1, random.randint(1, 6), random.randint(1, 6))
-    #         self.ai_board.add_ship(boat2.dots(), boat2.contour(boat2.dots()), True)
-    #         if self.ai_board.live_ships == 5:
-    #             break
-    #     while True:
-    #         boat3 = Ship(1, random.randint(1, 6), random.randint(1, 6))
-    #         self.ai_board.add_ship(boat3.dots(), boat3.contour(boat3.dots()), True)
-    #         if self.ai_board.live_ships == 6:
-    #             break
-    #     while True:
-    #         boat4 = Ship(1, random.randint(1, 6), random.randint(1, 6))
-    #         self.ai_board.add_ship(boat4.dots(), boat4.contour(boat4.dots()), True)
-    #         if self.ai_board.live_ships == 7:
-    #             break
-    #     self.ai_board.generate_board()
-    #     return self.ai_board
-
     def gen_ai_board(self):  # метод устанавливает корабли и формирует игровую доску игрока-компьютера
-        self.ai_board = Board(ships=[])
-        ship_count = 0
-        for ship_size in (3, 2, 2, 1, 1, 1, 1):
-            ship_count = ship_count + 1
-            while True:
-                ship = Ship(ship_size, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
-                self.ai_board.add_ship(ship.dots(), ship.contour(ship.dots()), True)
-                if self.ai_board.live_ships == ship_count:
-                    print(ship.size, ship.x, ship.y, ship.direction)
-                    self.ai_board.generate_board()
+        attempt_count = 0  # задаем начальное количество попыток установки корабля
+        while self.ai_board.live_ships != 7:  # цикл будет повторяться, пока успешно не установим все 7 кораблей
+            ship_count = 0  # начальное значение счетчика кораблей
+            for ship_size in (3, 2, 2, 1, 1, 1, 1):
+                ship_count = ship_count + 1  # счетчик кораблей
+                if attempt_count > 100:  # если попыток больше 100, цикл прерывается и уходит на while
+                    attempt_count = 0  # если уходим на "большой" цикл - счетчик сбрасываем
                     break
-
+                while True:
+                    ship = Ship(ship_size, random.randint(1, 6), random.randint(1, 6), random.randint(0, 1))
+                    self.ai_board.add_ship(ship.dots(), ship.contour(ship.dots()), True)
+                    attempt_count = attempt_count + 1  # счетчик попыток
+                    if attempt_count > 100:  # если попыток больше 100, цикл прерывается и уходит на for, где тоже прерывается и уходит на while
+                        break
+                    if self.ai_board.live_ships == ship_count:
+                        attempt_count = 0  # если корабль установлен - счетчик сбрасываем
+                        break
+        self.ai_board.generate_board()
         return self.ai_board
 
 
