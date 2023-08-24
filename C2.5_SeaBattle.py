@@ -17,7 +17,7 @@ class Dot:  # класс точек
 
 
 class Ship:  # класс корабля
-    def __init__(self, size, x, y, direction=0, ship_dots=None):
+    def __init__(self, size, x, y, direction=0, ship_dots=[]):
         self.size = size
         self.x = x
         self.y = y
@@ -53,12 +53,14 @@ class Ship:  # класс корабля
 
 
 class Board:  # класс игровой доски
-    def __init__(self, board=None, ships=[], hid=False, live_ships=None):
+    def __init__(self, board=None, ships=[], hid=False, live_ships=0):
         self.board = [[Dot.empty_dot] * 6 for _ in range(6)]
         self.ships = ships
         self.hid = hid
-        self.live_ships = 0
+        self.live_ships = live_ships
         self.ship_contours = []
+        self.shot_points = []
+        self.unique_ships = []
 
     def generate_board(self):  # метод вывода доски (с красивой графикой)
         if not self.hid:
@@ -81,7 +83,8 @@ class Board:  # класс игровой доски
             for i in ship_dots:  # проверяем, не находится ли какая-то из точек корабля в "запретном диапазоне"
                 if i in self.ships or i in self.ship_contours or i.x < 0 or i.x > 5 or i.y < 0 or i.y > 5:
                     raise IndexError  # если да, то инициируем ошибку
-            self.ships = self.ships + ship_dots  # дополняем список кораблей списком точек очередного корабля
+            self.ships = self.ships + ship_dots  # дополняем список точек кораблей списком точек очередного корабля
+            self.unique_ships = self.unique_ships + [ship_dots]
             for i in ship_dots:  # ставим корабль на доску
                 self.board[i.x][i.y] = i.ship_dot
             for i in ship_contour:  # добавляем контур корабля в список контуров доски
@@ -92,11 +95,31 @@ class Board:  # класс игровой доски
             if hid is False:  # этот параметр для расстановки доски игрока-компьютера, сообщение не выводим
                 print("Диапазон занят либо некорректен, попробуйте еще раз")
 
+    def shot(self, shot_point):
+        try:
+            if shot_point in self.shot_points or\
+            shot_point.x < 1 or shot_point.x > 6 or shot_point.y < 1 or shot_point.y > 6:
+                raise IndexError
+            for i in range(7):
+                index = 0
+                for j in self.unique_ships[i]:
+                    if shot_point in j:
+                        self.board[shot_point.x][shot_point.y] = shot_point.destroyed_ship_dot
+                        self.unique_ships[i][index] = 1
+
+
+
+
 
 class Player:
-    def __init__(self, player_b=None, ai_b=None):
-        self.player_b = player_b
-        self.ai_b = ai_b
+    def __init__(self, my_board, enemy_board):
+        self.my_board = my_board
+        self.enemy_board = enemy_board
+
+    def ask(self):
+        None
+
+    # def move(self):
 
 
 class Game:
@@ -108,7 +131,7 @@ class Game:
         self.ships_sizes = (3, 2, 2, 1, 1, 1, 1)  # список размеров кораблей
         self.ship_names = ('крейсер (3 точки)', "эсминец 1 (2 точки)", "эсминец 2 (2 точки)",
                            "катер 1 (1 точка)", "катер 2 (1 точка)", "катер 3 (1 точка)", "катер 4 (1 точка)")  # список
-                            # названий кораблей
+        # названий кораблей
 
     def gen_player_board(self):  # метод устанавливает корабли и формирует игровую доску игрока-человека
         ship_count = 0  # начальное значение счетчика кораблей
@@ -154,5 +177,15 @@ class Game:
 
 
 g = Game()
-g.gen_player_board()
+# g.gen_player_board()
 g.gen_ai_board()
+print(g.ai_board.unique_ships)
+print()
+print(g.ai_board.unique_ships[0])
+print()
+print(g.ai_board.unique_ships[0][0])
+print()
+g.ai_board.unique_ships[0][0] = 1
+print(g.ai_board.unique_ships[0])
+
+
