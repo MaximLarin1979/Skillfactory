@@ -176,6 +176,7 @@ class Game:
                     self.ai_board.add_ship(ship.dots(), ship.contour(ship.dots()), True)
                     attempt_count = attempt_count + 1  # счетчик попыток
                     if attempt_count > 100:  # если попыток больше 100, цикл прерывается и уходит на for, где тоже прерывается и уходит на while
+                        self.ai_board = Board()  # "обнуляем" доску от ранее расставленных кораблей
                         break
                     if self.ai_board.live_ships == ship_count:
                         attempt_count = 0  # если корабль установлен - счетчик сбрасываем
