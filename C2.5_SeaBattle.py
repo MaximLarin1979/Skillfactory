@@ -7,6 +7,7 @@ class Dot:  # класс точек
     ship_dot = "■"
     destroyed_ship_dot = "X"
     missed_dot = "T"
+    contour_dot = "□"
 
     def __init__(self, x, y):
         self.x = x
@@ -58,7 +59,7 @@ class Board:  # класс игровой доски
         self.shot_points = []
         self.unique_ships = []
 
-    def generate_board(self):  # метод вывода доски (с красивой графикой)
+    def print_board(self):  # метод вывода доски (с красивой графикой)
         if not self.hid:
             for i in range(7):
                 if i == 0:
@@ -81,8 +82,9 @@ class Board:  # класс игровой доски
                     raise IndexError  # если да, то инициируем ошибку
             self.ships = self.ships + ship_dots  # дополняем список точек кораблей списком точек очередного корабля
             self.unique_ships = self.unique_ships + [ship]
-            for i in ship_dots:  # ставим корабль на доску
-                self.board[i.x][i.y] = i.ship_dot
+            if hid is False:
+                for i in ship_dots:  # ставим корабль на доску (для игрока-человека)
+                    self.board[i.x][i.y] = i.ship_dot
             for i in ship_contour:  # добавляем контур корабля в список контуров доски
                 self.ship_contours = self.ship_contours + [i]
             self.live_ships = self.live_ships + 1  # добавляем установленный корабль в счетчик "живых кораблей"
@@ -113,6 +115,8 @@ class Board:  # класс игровой доски
                             if i.hp == 0:  # если хитпоинтов корабля ноль,
                                 # то выводим сообщения (для игрока-человека), что корабль уничтожен
                                 self.live_ships = self.live_ships - 1  # счетчик "живых" кораблей доски
+                                for k in i.ship_contour:
+                                    self.board[k.x][k.y] = k.contour_dot
                                 if hid is False:
                                     print("Корабль уничтожен")
                                     break
@@ -140,10 +144,9 @@ class Player:
     def ask(self):
         return self.shot_point
 
-    def move(self):
-        # print(self.my_board)
+    def move(self, hid=False):
         self.enemy_board.shot(self.shot_point, self.hid)
-        self.enemy_board.generate_board()
+        self.enemy_board.print_board()
         if self.enemy_board.live_ships == 0:
             print("Победа игрока ", self.player)
 
@@ -171,7 +174,7 @@ class AI(Player):
         self.hid = hid
 
     def ask(self):
-        self.shot_point = Dot(random.randint(1, 6), random.randint(1, 6))
+        self.shot_point = Dot(random.randint(0, 5), random.randint(0, 5))
         return self.shot_point
 
 
@@ -201,7 +204,7 @@ class Game:
                     ship = Ship(ship_size, int(input('Введите координату X')), int(input('Введите координату Y')))
                 self.player_board.add_ship(ship.dots(), ship.contour(ship.dots()), False, ship)
                 if self.player_board.live_ships == ship_count:
-                    self.player_board.generate_board()
+                    self.player_board.print_board()
                     break
         return self.player_board
 
@@ -225,16 +228,19 @@ class Game:
                     if self.ai_board.live_ships == ship_count:
                         attempt_count = 0  # если корабль установлен - счетчик сбрасываем
                         break
-        self.ai_board.generate_board()
+        # self.ai_board.print_board()
         return self.ai_board
 
 
 g = Game()
-# g.gen_player_board()
+g.gen_player_board()
 g.gen_ai_board()
-p = User(my_board=None, enemy_board=g.ai_board)
-p.ask()
-# print(p.enemy_board.ships)
-p.move()
+pl = User(my_board=g.player_board, enemy_board=g.ai_board)
+ai = AI(my_board=g.ai_board, enemy_board=g.player_board)
+while True:
+    pl.ask()
+    pl.move()
+    ai.ask()
+    ai.move()
 
 
