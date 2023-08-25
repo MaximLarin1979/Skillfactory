@@ -95,27 +95,36 @@ class Board:  # класс игровой доски
             if hid is False:  # этот параметр для расстановки доски игрока-компьютера, сообщение не выводим
                 print("Диапазон занят либо некорректен, попробуйте еще раз")
 
-    def shot(self, shot_point=None, hid = False):
-        x = int(input('x'))
-        y = int(input('y'))
-        shot_point = Dot(x, y)
+    def shot(self, shot_point, hid=False):  # метод выполняет обработку выстрела по доске
         try:
-            if shot_point in self.shot_points or\
-            shot_point.x < 1 or shot_point.x > 6 or shot_point.y < 1 or shot_point.y > 6:
+            if shot_point in self.shot_points or \
+                    shot_point.x < 1 or shot_point.x > 6 or shot_point.y < 1 or shot_point.y > 6:  # если выстрел сделан
+                # вне поля, либо туда, куда уже ранее был сделан выстрел, объявляется исключение
                 raise IndexError
-            self.board[shot_point.x][shot_point.y] = shot_point.destroyed_ship_dot
-            self.shot_points = self.shot_points + [shot_point]
-            for i in self.unique_ships:
-                for j in self.unique_ships[i]:
-                    if shot_point == j:
-                        self.unique_ships[i] = self.unique_ships[i].hit_points()
-                        if self.unique_ships.hp == 0:
-                            print("Корабль уничтожен")
-                        else:
-                            print("Корабль поврежден")
+            self.shot_points = self.shot_points + [shot_point]  # счетчик уже сделанных выстрелов
+            if shot_point in self.ships:  # проверка, попал ли выстрел в какую-то из клеток кораблей доски
+                self.board[shot_point.x-1][shot_point.y-1] = shot_point.destroyed_ship_dot
+                for i in self.unique_ships:  # проверяем список "уникальных" кораблей доски (список класса Ship), при
+                    # определении, в какой корабль попал выстрел - отнимаем хитпоинт
+                    for j in self.unique_ships[i]:  # пробегаемся по точкам каждого корабля
+                        if shot_point == j:
+                            self.unique_ships[i] = self.unique_ships[i].hit_points()  # метод, отнимающий хитпоинт
+                            if self.unique_ships[i].hp == 0:  # если хитпоинтов корабля ноль, то выводим сообщения
+                                # (для игрока-человека), что корабль уничтожен
+                                self.live_ships = self.live_ships - 1  # счетчик "живых" кораблей доски
+                                if hid is False:
+                                    print("Корабль уничтожен")
+                            elif hid is False:
+                                print("Корабль поврежден")
+            else:
+                self.board[shot_point.x - 1][shot_point.y - 1] = shot_point.missed_dot  # если в корабль не попали,
+                # ставим точку "промаха
+            return self.board
+
         except IndexError:
-            if hid is False:  # этот параметр для расстановки доски игрока-компьютера, сообщение не выводим
-                print("Диапазон занят либо некорректен, попробуйте еще раз")
+            if hid is False:  # выводим сообщение для игрока-человека, не выводим для игрока-компьютера
+                print("Координаты выстрела некорректны, либо повторны, попробуйте еще раз")
+
 
 class Player:
     def __init__(self, my_board, enemy_board):
@@ -185,6 +194,6 @@ class Game:
 g = Game()
 # g.gen_player_board()
 g.gen_ai_board()
-b = Board(board=g.gen_ai_board())
-b.shot()
-b.generate_board()
+# b = Board(board=g.gen_ai_board())
+# b.shot()
+# b.generate_board()
