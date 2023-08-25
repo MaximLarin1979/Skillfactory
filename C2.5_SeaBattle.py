@@ -47,10 +47,6 @@ class Ship:  # класс корабля
                             Dot(a, b)]  # формируем список точек "контура", куда корабли ставить нельзя
         return self.ship_contour
 
-    def hit_points(self):  # метод будет считать уменьшение здоровья корабля при попадании
-        self.hp = self.hp - 1
-        return self.hp
-
 
 class Board:  # класс игровой доски
     def __init__(self, board=None, ships=[], hid=False, live_ships=0):
@@ -98,26 +94,33 @@ class Board:  # класс игровой доски
     def shot(self, shot_point, hid=False):  # метод выполняет обработку выстрела по доске
         try:
             if shot_point in self.shot_points or \
-                    shot_point.x < 1 or shot_point.x > 6 or shot_point.y < 1 or shot_point.y > 6:  # если выстрел сделан
+                    shot_point.x < 0 or shot_point.x > 6 or shot_point.y < 0 or shot_point.y > 6:  # если выстрел сделан
                 # вне поля, либо туда, куда уже ранее был сделан выстрел, объявляется исключение
                 raise IndexError
             self.shot_points = self.shot_points + [shot_point]  # счетчик уже сделанных выстрелов
             if shot_point in self.ships:  # проверка, попал ли выстрел в какую-то из клеток кораблей доски
-                self.board[shot_point.x-1][shot_point.y-1] = shot_point.destroyed_ship_dot
+                self.board[shot_point.x][shot_point.y] = shot_point.destroyed_ship_dot
+                unique_ship_counter = -1
                 for i in self.unique_ships:  # проверяем список "уникальных" кораблей доски (список класса Ship), при
                     # определении, в какой корабль попал выстрел - отнимаем хитпоинт
-                    for j in self.unique_ships[i]:  # пробегаемся по точкам каждого корабля
+                    unique_ship_counter = unique_ship_counter + 1
+                    for j in i.ship_dots:  # пробегаемся по точкам каждого корабля
                         if shot_point == j:
-                            self.unique_ships[i] = self.unique_ships[i].hit_points()  # метод, отнимающий хитпоинт
-                            if self.unique_ships[i].hp == 0:  # если хитпоинтов корабля ноль, то выводим сообщения
-                                # (для игрока-человека), что корабль уничтожен
+                            print(self.unique_ships[unique_ship_counter].hp)
+                            self.unique_ships[unique_ship_counter].hp = self.unique_ships[unique_ship_counter].hp - 1
+                            # отнимаем хитпоинт
+                            print(self.unique_ships[unique_ship_counter].hp)
+                            if i.hp == 0:  # если хитпоинтов корабля ноль,
+                                # то выводим сообщения (для игрока-человека), что корабль уничтожен
                                 self.live_ships = self.live_ships - 1  # счетчик "живых" кораблей доски
                                 if hid is False:
                                     print("Корабль уничтожен")
+                                    break
                             elif hid is False:
                                 print("Корабль поврежден")
+                                break
             else:
-                self.board[shot_point.x - 1][shot_point.y - 1] = shot_point.missed_dot  # если в корабль не попали,
+                self.board[shot_point.x][shot_point.y] = shot_point.missed_dot  # если в корабль не попали,
                 # ставим точку "промаха
             return self.board
 
@@ -127,14 +130,49 @@ class Board:  # класс игровой доски
 
 
 class Player:
-    def __init__(self, my_board, enemy_board):
+    def __init__(self, player, my_board, enemy_board, shot_point=None, hid=True):
+        self.player = player
         self.my_board = my_board
         self.enemy_board = enemy_board
+        self.shot_point = shot_point
+        self.hid = hid
 
     def ask(self):
-        None
+        return self.shot_point
 
-    # def move(self):
+    def move(self):
+        # print(self.my_board)
+        self.enemy_board.shot(self.shot_point, self.hid)
+        self.enemy_board.generate_board()
+        if self.enemy_board.live_ships == 0:
+            print("Победа игрока ", self.player)
+
+
+class User(Player):
+    def __init__(self, my_board, enemy_board, shot_point=None, player='"Человек"', hid=False):
+        super().__init__(player, my_board, enemy_board, shot_point=None, hid=True)
+        self.my_board = []  # УБРАТЬ
+        self.player = player
+        self.hid = hid
+
+    def ask(self):
+        print("Введите координаты выстрела:")
+        x = int(input("X:")) - 1
+        y = int(input("Y:")) - 1
+        self.shot_point = Dot(x, y)
+        return self.shot_point
+
+
+class AI(Player):
+    def __init__(self, my_board, enemy_board, shot_point=None, player='"Компьютер"', hid=True):
+        super().__init__(player, my_board, enemy_board, shot_point=None, hid=True)
+        self.my_board = []  # УБРАТЬ
+        self.player = player
+        self.hid = hid
+
+    def ask(self):
+        self.shot_point = Dot(random.randint(1, 6), random.randint(1, 6))
+        return self.shot_point
 
 
 class Game:
@@ -194,6 +232,9 @@ class Game:
 g = Game()
 # g.gen_player_board()
 g.gen_ai_board()
-# b = Board(board=g.gen_ai_board())
-# b.shot()
-# b.generate_board()
+p = User(my_board=None, enemy_board=g.ai_board)
+p.ask()
+# print(p.enemy_board.ships)
+p.move()
+
+
