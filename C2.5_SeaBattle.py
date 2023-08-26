@@ -18,7 +18,9 @@ class Dot:  # класс точек
 
 
 class Ship:  # класс корабля
-    def __init__(self, size, x, y, direction=0, ship_dots=[]):
+    def __init__(self, size, x, y, direction=0, ship_dots=None):
+        if ship_dots is None:
+            ship_dots = []
         self.size = size
         self.x = x
         self.y = y
@@ -50,8 +52,12 @@ class Ship:  # класс корабля
 
 
 class Board:  # класс игровой доски
-    def __init__(self, board=None, ships=[], hid=False, live_ships=0):
-        self.board = [[Dot.empty_dot] * 6 for _ in range(6)]
+    def __init__(self, board=None, ships=None, hid=False, live_ships=0):
+        if ships is None:
+            ships = []
+        if board is None:
+            board = [[Dot.empty_dot] * 6 for _ in range(6)]
+        self.board = board
         self.ships = ships
         self.hid = hid
         self.live_ships = live_ships
@@ -73,7 +79,7 @@ class Board:  # класс игровой доски
                     else:
                         print(self.board[i][j], end=" | ")
                 print()
-        print(f"\n{self.live_ships} кораблей в строю")  # показываем игроку, сколько у него живых кораблей осталось
+        print(f"\n{self.live_ships} кораблей в строю\n")  # показываем игроку, сколько у него живых кораблей осталось
 
     def add_ship(self, ship_dots, ship_contour, hid, ship):  # метод добавления корабля на игровую доску
         try:
@@ -108,10 +114,8 @@ class Board:  # класс игровой доски
                     unique_ship_counter = unique_ship_counter + 1
                     for j in i.ship_dots:  # пробегаемся по точкам каждого корабля
                         if shot_point == j:
-                            print(self.unique_ships[unique_ship_counter].hp)
                             self.unique_ships[unique_ship_counter].hp = self.unique_ships[unique_ship_counter].hp - 1
                             # отнимаем хитпоинт
-                            print(self.unique_ships[unique_ship_counter].hp)
                             if i.hp == 0:  # если хитпоинтов корабля ноль,
                                 # то выводим сообщения (для игрока-человека), что корабль уничтожен
                                 self.live_ships = self.live_ships - 1  # счетчик "живых" кораблей доски
@@ -146,15 +150,18 @@ class Player:
 
     def move(self, hid=False):
         self.enemy_board.shot(self.shot_point, self.hid)
+        if hid is False:
+            print("Ваша игровая доска:", "\n")
+        else:
+            print("Игровая доска противника:", "\n")
         self.enemy_board.print_board()
         if self.enemy_board.live_ships == 0:
             print("Победа игрока ", self.player)
 
 
 class User(Player):
-    def __init__(self, my_board, enemy_board, shot_point=None, player='"Человек"', hid=False):
+    def __init__(self, my_board, enemy_board, player='"Человек"', hid=False):
         super().__init__(player, my_board, enemy_board, shot_point=None, hid=True)
-        self.my_board = []  # УБРАТЬ
         self.player = player
         self.hid = hid
 
@@ -169,7 +176,6 @@ class User(Player):
 class AI(Player):
     def __init__(self, my_board, enemy_board, shot_point=None, player='"Компьютер"', hid=True):
         super().__init__(player, my_board, enemy_board, shot_point=None, hid=True)
-        self.my_board = []  # УБРАТЬ
         self.player = player
         self.hid = hid
 
@@ -198,10 +204,10 @@ class Game:
             while True:
                 print("Устанавливаем ", self.ship_names[ship_name_count])
                 if ship_size > 1:
-                    ship = Ship(ship_size, int(input('Введите координату X')), int(input('Введите координату Y')),
+                    ship = Ship(ship_size, int(input("Введите координату X:")), int(input("Введите координату Y:")),
                                 int(input('Введите направление')))
                 else:  # если корабль из одной точки, направление спрашивать не нужно
-                    ship = Ship(ship_size, int(input('Введите координату X')), int(input('Введите координату Y')))
+                    ship = Ship(ship_size, int(input("Введите координату X:")), int(input("Введите координату Y:")))
                 self.player_board.add_ship(ship.dots(), ship.contour(ship.dots()), False, ship)
                 if self.player_board.live_ships == ship_count:
                     self.player_board.print_board()
@@ -231,16 +237,22 @@ class Game:
         # self.ai_board.print_board()
         return self.ai_board
 
+    def game_loop(self):
+        pl = User(my_board=g.player_board, enemy_board=g.ai_board)
+        ai = AI(my_board=g.ai_board, enemy_board=g.player_board)
+        move_count = 1
+        while True:
+            print("Ход ", move_count)
+            move_count = move_count + 1
+            pl.ask()
+            pl.move(hid=True)
+            ai.ask()
+            ai.move(hid=False)
+            if pl.my_board.live_ships == 0 or ai.my_board.live.ships == 0:
+                break
 
 g = Game()
 g.gen_player_board()
 g.gen_ai_board()
-pl = User(my_board=g.player_board, enemy_board=g.ai_board)
-ai = AI(my_board=g.ai_board, enemy_board=g.player_board)
-while True:
-    pl.ask()
-    pl.move()
-    ai.ask()
-    ai.move()
-
+g.game_loop()
 
