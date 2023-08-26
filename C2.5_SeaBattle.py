@@ -1,19 +1,19 @@
 import random
 
 
-class Dot:  # класс точек
+class Dot:  # класс точек и виды отображения точек на игровой доске
     type = 'dot'
-    empty_dot = "O"
-    ship_dot = "■"
-    destroyed_ship_dot = "X"
-    missed_dot = "T"
-    contour_dot = "□"
+    empty_dot = "O"  # пустая точка
+    ship_dot = "■"  # точка с кораблем
+    destroyed_ship_dot = "X"  # точка с уничтоженным кораблем
+    missed_dot = "T"  # точка промаха
+    contour_dot = "□"  # точка контура корабля
 
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
-    def __eq__(self, other):  # метод сравнения, возможно пригодится в дальнейшем
+    def __eq__(self, other):  # метод сравнения точек
         return self.x == other.x and self.y == other.y
 
 
@@ -79,7 +79,8 @@ class Board:  # класс игровой доски
                     else:
                         print(self.board[i][j], end=" | ")
                 print()
-        print(f"\n{self.live_ships} кораблей в строю\n")  # показываем игроку, сколько у него живых кораблей осталось
+        print(f"\n{self.live_ships} кораблей в строю\n")  # показываем , сколько у него живых кораблей
+        # осталось на доске
 
     def add_ship(self, ship_dots, ship_contour, hid, ship):  # метод добавления корабля на игровую доску
         try:
@@ -87,7 +88,7 @@ class Board:  # класс игровой доски
                 if i in self.ships or i in self.ship_contours or i.x < 0 or i.x > 5 or i.y < 0 or i.y > 5:
                     raise IndexError  # если да, то инициируем ошибку
             self.ships = self.ships + ship_dots  # дополняем список точек кораблей списком точек очередного корабля
-            self.unique_ships = self.unique_ships + [ship]
+            self.unique_ships = self.unique_ships + [ship]  # дополняем список уникальных кораблей класса Ship
             if hid is False:
                 for i in ship_dots:  # ставим корабль на доску (для игрока-человека)
                     self.board[i.x][i.y] = i.ship_dot
@@ -119,15 +120,16 @@ class Board:  # класс игровой доски
                             if i.hp == 0:  # если хитпоинтов корабля ноль,
                                 # то выводим сообщения (для игрока-человека), что корабль уничтожен
                                 self.live_ships = self.live_ships - 1  # счетчик "живых" кораблей доски
-                                for k in i.ship_contour:
+                                for k in i.ship_contour:  # уничтоженный корабль обводим контуром для удобства
                                     self.board[k.x][k.y] = k.contour_dot
                                 if hid is False:
-                                    print("Корабль уничтожен")
+                                    print("Корабль уничтожен!")
                                     break
-                            elif hid is False:
-                                print("Корабль поврежден")
+                            elif hid is False:  # если у корабля есть еще не подбитые точки (хитпоинты)
+                                print("Корабль поврежден!")
                                 break
             else:
+                print("Промах!")
                 self.board[shot_point.x][shot_point.y] = shot_point.missed_dot  # если в корабль не попали,
                 # ставим точку "промаха
             return self.board
@@ -137,7 +139,7 @@ class Board:  # класс игровой доски
                 print("Координаты выстрела некорректны, либо повторны, попробуйте еще раз")
 
 
-class Player:
+class Player:  # класс игрока
     def __init__(self, player, my_board, enemy_board, shot_point=None, hid=True):
         self.player = player
         self.my_board = my_board
@@ -145,27 +147,29 @@ class Player:
         self.shot_point = shot_point
         self.hid = hid
 
-    def ask(self):
+    def ask(self):  # метод ввода точки выстрела, данный метод переопределен в "подклассах", т.к. игрок-человек
+        # вводит точки вручную, а компьютер автоматически
         return self.shot_point
 
-    def move(self, hid=False):
+    def move(self, hid=False):  # метод делает игровой ход - выстрел по доске противника и обработку результата
         self.enemy_board.shot(self.shot_point, self.hid)
         if hid is False:
             print("Ваша игровая доска:", "\n")
         else:
             print("Игровая доска противника:", "\n")
         self.enemy_board.print_board()
-        if self.enemy_board.live_ships == 0:
-            print("Победа игрока ", self.player)
+        if self.enemy_board.live_ships == 0:  # если живых кораблей ноль, объявляется победа данного игрока
+            # (человека либо компьютера)
+            print("Победа игрока ", self.player, "\n")
 
 
-class User(Player):
+class User(Player):  # наследуемый подкласс для игрока-человека
     def __init__(self, my_board, enemy_board, player='"Человек"', hid=False):
         super().__init__(player, my_board, enemy_board, shot_point=None, hid=True)
         self.player = player
         self.hid = hid
 
-    def ask(self):
+    def ask(self):  # метод ввода точки стрельбы для человека
         print("Введите координаты выстрела:")
         x = int(input("X:")) - 1
         y = int(input("Y:")) - 1
@@ -173,18 +177,18 @@ class User(Player):
         return self.shot_point
 
 
-class AI(Player):
-    def __init__(self, my_board, enemy_board, shot_point=None, player='"Компьютер"', hid=True):
+class AI(Player):  # наследуемый подкласс для игрока-компьютера
+    def __init__(self, my_board, enemy_board, player='"Компьютер"', hid=True):
         super().__init__(player, my_board, enemy_board, shot_point=None, hid=True)
         self.player = player
         self.hid = hid
 
-    def ask(self):
+    def ask(self):  # метод ввода точки стрельбы для компьютера
         self.shot_point = Dot(random.randint(0, 5), random.randint(0, 5))
         return self.shot_point
 
 
-class Game:
+class Game:  # класс игрового цикла - расстановки кораблей и собственно игры
     def __init__(self, player=None, ai=None):
         self.player = player
         self.player_board = Board()
@@ -196,6 +200,7 @@ class Game:
         # названий кораблей
 
     def gen_player_board(self):  # метод устанавливает корабли и формирует игровую доску игрока-человека
+        print(self.player_board.print_board())  # перед началом расстановки выведем пустую игровую доску
         ship_count = 0  # начальное значение счетчика кораблей
         ship_name_count = -1  # начальное значение счетчика названий кораблей
         for ship_size in self.ships_sizes:
@@ -237,22 +242,50 @@ class Game:
         # self.ai_board.print_board()
         return self.ai_board
 
-    def game_loop(self):
+    def game_loop(self):  # метод непосредственно игрового цикла, считает ходы,
+        # по очереди вызывает методы ходов для игроков и в случае победы одного из игроков завершает игру
         pl = User(my_board=g.player_board, enemy_board=g.ai_board)
         ai = AI(my_board=g.ai_board, enemy_board=g.player_board)
         move_count = 1
         while True:
-            print("Ход ", move_count)
+            print("Ход ", move_count, "\n")
             move_count = move_count + 1
             pl.ask()
             pl.move(hid=True)
             ai.ask()
             ai.move(hid=False)
-            if pl.my_board.live_ships == 0 or ai.my_board.live.ships == 0:
+            if pl.enemy_board.live_ships == 0 or ai.enemy_board.live_ships == 0:
                 break
 
+    def greeting(self):
+        print("Правила игры:"
+              "\n1. Играем с компьютером"
+              "\n2. Игровая доска - поле 6х6 клеток"
+              "\n3. В начале игры расставляем корабли на игровой доске"
+              "\n4. У вас 1 трехпалубный крейсер, 2 двухпалубных эсминца и 4 однопалубных катера"
+              "\n5. Игра начинается с расстановки кораблей на игровой доске:"
+              "\nвводим координаты носа корабля (X - горизонталь, Y - вертикаль)"
+              "\nи (кроме однопалубных катеров) направление корабля"
+              "\n(0 - горизонтальное, 1 или любая другая цифра - вертикальное)"
+              "\n4. Ставить корабли в соседних точках друг с другом нельзя, в этом случае будет предложена"
+              "\nповторная попытка"
+              "\n5. Компьютер расставляет свои корабли автоматически"
+              "\n6. Далее игроки (Вы и компьютер) по очереди делаете выстрелы, вводя координаты X и Y"
+              "\n7. Стрелять вне доски либо в точку, куда ранее стреляли - нельзя, в этом случае будет предложен"
+              "\nповторный ход"
+              "\n8. После выстрела будет выведено сообщение о результате - промах, либо корабль подбит, либо уничтожен"
+              "\n9. Подбитые корабли обозначаются крестиком, промахи - буквой Т"
+              "\n10. Если Вы уничтожили корабль противника, на игровой доске противника он будет для удобства"
+              "\nобведен контуром - туда стрелять смысла нет"
+              "\n11. После каждого хода будет выводится Ваша доска с результатами стрельбы противника, и доска"
+              "\nпротивника с результатами Вашей стрельбы, а также количество оставшихся у Вас и у противника кораблей"
+              "\n12. Выигрывает тот, кто первый уничтожит все корабли противника"
+              "\n УДАЧИ!"
+              "\n")
+
+
 g = Game()
+g.greeting()
 g.gen_player_board()
 g.gen_ai_board()
 g.game_loop()
-
