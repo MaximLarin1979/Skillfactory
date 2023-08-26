@@ -79,7 +79,7 @@ class Board:  # класс игровой доски
                     else:
                         print(self.board[i][j], end=" | ")
                 print()
-        print(f"\n{self.live_ships} кораблей в строю\n")  # показываем , сколько у него живых кораблей
+        print(f"\n{self.live_ships} кораблей в строю\n")  # показываем , сколько живых кораблей
         # осталось на доске
 
     def add_ship(self, ship_dots, ship_contour, hid, ship):  # метод добавления корабля на игровую доску
