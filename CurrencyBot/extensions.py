@@ -21,7 +21,7 @@ class CurrencyConverter:
             raise APIException(f'Ну удалось обработать валюту {base}')
         try:
             amount = float(amount)
-        except KeyError:
+        except ValueError:
             raise APIException(f'Ну удалось обработать количество {amount}')
         quote_ticker, base_ticker = keys[quote], keys[base]
         r = requests.get(f'https://api.exchangerate.host/convert?from={quote_ticker}&to={base_ticker}&amount={amount}')
