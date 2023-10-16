@@ -33,7 +33,11 @@ def generate_response(prompt):
         model="gpt-3.5-turbo",
         messages=[
             {"role": "user", "content": prompt}
-        ]
+        ],
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        temperature=0.5
     )
     return completion.choices[0].message.content
 
