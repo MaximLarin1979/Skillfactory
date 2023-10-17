@@ -4,7 +4,7 @@ import openai
 import logging
 import time
 from tokens import TOKEN_TELEBOT, TOKEN_OPENAI
-
+from users import users
 
 bot = telebot.TeleBot(TOKEN_TELEBOT)
 openai.api_key = TOKEN_OPENAI
@@ -23,7 +23,7 @@ logging.basicConfig(filename=os.path.join(log_dir, 'error.log'), level=logging.E
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     bot.reply_to(message,
-                 'Привет!\nЯ ChatGPT 3.5 бот компании S+ консалтинг\U0001F916\nЗадай мне любой вопрос, и я постараюсь '
+                 'Привет!\nЯ ChatGPT 3.5 бот компании S+Консалтинг\U0001F916\nЗадай мне любой вопрос, и я постараюсь '
                  'на него ответить!')
 
 
@@ -42,20 +42,15 @@ def generate_response(prompt):
     return completion.choices[0].message.content
 
 
-# Обработчик команды /bot
-@bot.message_handler(commands=['bot'])
-def command_message(message):
-    prompt = message.text
-    response = generate_response(prompt)
-    bot.reply_to(message, text=response)
-
-
-# Обработчик остальных сообщений
+# Обработчик сообщений
 @bot.message_handler(func=lambda _: True)
 def handle_message(message):
-    prompt = message.text
-    response = generate_response(prompt)
-    bot.send_message(chat_id=message.from_user.id, text=response)
+    if message.from_user.username not in users:
+        bot.send_message(message.chat.id, 'Вы не авторизованы в чат-боте')
+    else:
+        prompt = message.text
+        response = generate_response(prompt)
+        bot.send_message(chat_id=message.from_user.id, text=response)
 
 
 # Запуск бота
