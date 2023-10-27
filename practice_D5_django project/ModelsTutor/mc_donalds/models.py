@@ -1,6 +1,6 @@
 from datetime import datetime
 from django.db import models
-from resources import POSITIONS, cashier
+from .resources import POSITIONS, cashier
 
 
 class Staff(models.Model):
@@ -52,5 +52,5 @@ class ProductOrder(models.Model):
         self._amount = int(value) if value >= 0 else 0
         self.save()
 
-    # def product_sum(self):
-    #     return self.product.price * self.amount
+    def product_sum(self):
+        return self.product.price * self.amount
