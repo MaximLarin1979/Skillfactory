@@ -1,0 +1,74 @@
+python manage.py shell
+from DB_app import *
+from DB_app.models import *
+from django.contrib.auth.models import User
+
+1.	Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+
+User.objects.create_user(password='admin1', is_superuser=True, username='ASPushkin', last_name='Пушкин', email='pushkin@mail.ru', is_staff=True, is_active=True, first_name='Александр')
+User.objects.create_user(password='admin2', is_superuser=False, username='MULermontov', last_name='Лермонтов', email='lermontov@mail.ru', is_staff=False, is_active=True, first_name='Михаил')
+
+2.	Создать два объекта модели Author, связанные с пользователями.
+
+Author.objects.create(author=User.objects.get(pk=1))
+Author.objects.create(author=User.objects.get(pk=2))
+
+3.	Добавить 4 категории в модель Category.
+
+Category.objects.create(category_name='Политика')
+Category.objects.create(category_name='Экономика')
+Category.objects.create(category_name='Культура')
+Category.objects.create(category_name='Спорт')
+
+4.	Добавить 2 статьи и 1 новость.
+
+Post.objects.create(post_type='ar', post_name='Потери денег ЕС', post_text='ЕС по самым скромным подсчетам потерял до 250 млрд евро из-за антироссийских санкций, заявил Лавров', author=Author.objects.get(pk=1))
+Post.objects.create(post_type='ar', post_name='Коронавирус', post_text='В России выявлено 10 случаев инфицирования новым вариантом COVID "Пирола", глава Роспотребнадзора ожидает, что он будет распространяться.', author=Author.objects.get(pk=1))
+Post.objects.create(post_type='ne', post_name='Воздушная тревога', post_text='Воздушная тревога объявлена в Севастополе', author=Author.objects.get(pk=2))
+
+5.	Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+
+Post.objects.get(pk=1).category.add(Category.objects.get(pk=1))
+Post.objects.get(pk=1).category.add(Category.objects.get(pk=2))
+Post.objects.get(pk=2).category.add(Category.objects.get(pk=2))
+Post.objects.get(pk=2).category.add(Category.objects.get(pk=1))
+Post.objects.get(pk=3).category.add(Category.objects.get(pk=1))
+
+6.	Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+
+Comment.objects.create(comment_text='Санкции работают!', user=User.objects.get(pk=2), post=Post.objects.get(pk=1))
+Comment.objects.create(comment_text='Новая волна!', user=User.objects.get(pk=2), post=Post.objects.get(pk=2))
+Comment.objects.create(comment_text='Все в укрытие!', user=User.objects.get(pk=1), post=Post.objects.get(pk=3))
+Comment.objects.create(comment_text='Когда следующий пакет?', user=User.objects.get(pk=2), post=Post.objects.get(pk=1))
+
+7.	Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+
+Post.objects.get(pk=1).post_like()
+Post.objects.get(pk=1).post_like()
+Post.objects.get(pk=1).post_like()
+Post.objects.get(pk=1).post_like()
+Post.objects.get(pk=2).post_dislike()
+Post.objects.get(pk=3).post_dislike()
+
+Comment.objects.get(pk=1).comment_like()
+Comment.objects.get(pk=2).comment_dislike()
+Comment.objects.get(pk=3).comment_like()
+
+8.	Обновить рейтинги пользователей.
+
+Author.objects.get(pk=1).update_rating()
+Author.objects.get(pk=2).update_rating()
+
+9.	Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+
+Author.objects.all().order_by('-author_rating').values('author', 'author_rating').first()
+
+10.	Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
+
+best_post= Post.objects.all().order_by('-post_rating').first()
+Post.objects.all().order_by('-post_rating').values('post_time', 'author__author__username', 'post_rating', 'post_name').first()
+best_post.preview()
+
+11.	Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+
+Comment.objects.filter(post=best_post).values('comment_time','user__username','comment_rating','comment_text')
